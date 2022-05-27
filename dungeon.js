@@ -1,23 +1,30 @@
-let output = document.querySelector('.output');
+const output = document.querySelector('.output');
 const txtInput = document.getElementById('txtInput');
 const form = document.querySelector('form');
 const delay = ms => new Promise(res => setTimeout(res, ms));
+let charClass;
+let charStat;
+let foeStat;
+let deathCount = 0;
+
+// Add Monster Array
 
 document.addEventListener('DOMContentLoaded', function () {
   //put start game back
- rollForStat();
+ startGame();
 });
-
-let fightPower;
-let charClass;
-let charStat
 
 // Rolls character stats
 
 function rollStat() {
   return Math.floor(Math.random() * 10)
 }
-console.log(rollStat())
+
+// Battle
+
+function fight(first, second) {
+  return results = first - second
+}
 
 // For cry babies only
 
@@ -26,12 +33,28 @@ const cryBaby = async () => {
   window.location.href = 'https://us.teletubbies.com/';
 };
 
+// Wrong Input
+
+function wrgInput() {
+  output.innerHTML = `Please take this serious, this isn't a game.<br> Make an appropriate  selection`;
+}
+
 // DEATH is fun
 
 function deathFun() {
-  alert("You died") // Change to a death screen
   // add +1 to death
+  deathCount++;
+  alert(`You died ${deathCount} Want to try again?`) // Change to a death screen
   //restart on okay
+  startGame()
+
+}
+
+// Load Next Scene
+
+const loadScene = function (scene) {
+  txtInput.value = '';
+  setTimeout(scene, 2000);
 }
 
 // Starts the game
@@ -50,17 +73,15 @@ function startGame() {
       case '1':
         output.innerHTML = `Yer a wizard 'arry, an excellent way to die`;
         charClass = 'wizard';
-        txtInput.value = '';
-        setTimeout(rollForStat, 2000);
+        loadScene('rollForStat()')
         break;
       case '2':
         output.innerHTML = `Ah, you think your sneaks will save you?`;
         charClass = 'rogue';
-        txtInput.value = '';
-        setTimeout(rollForRog, 2000);
+        loadScene('rollForStat()')
         break;
       default:
-        output.innerHTML = `Please take this serious, this isn't a game.<br> Make an appropriate  selection`;
+        wrgInput();
     }
     form.removeEventListener('submit', formListener);
   };
@@ -71,29 +92,24 @@ function startGame() {
 
 function rollForStat() {
   let stat = charClass == 'wizard' ? 'Int' : 'Haste';
-  output.innerHTML = `Do you want to go with 5 ${stat} (charClassInt, <br>
+  output.innerHTML = `Do you want to go with 5 ${stat} <br>
         or roll a d10? <br>If you roll 0 you die, no redos. <p>1. Lets roll baby!<br>2. I'll just take the 5.<br> 3. I don't want to play this anymore.`;
   let formListener = function (e){
     e.preventDefault();
     let select = txtInput.value;
 
-    const loadBattle1 = function() {
-      txtInput.value = '';
-      setTimeout(battle1, 2000);
-    }
     switch (select) {
       case '1':
         charStat = rollStat();
         if (charStat === 0) {
           output.innerHTML = `You rolled a ${charStat}.<br> Awwwww too bad, you die`;
-          deathFun();
-          // crash game modal maybe??
+          deathFun(); // crash game modal maybe??
         } else if (charStat < 0 || charStat < 5) {
           output.innerHTML = `You rolled a ${charStat}.<br> Tough luck, but maybe you wont die...`;
-          loadBattle1();
+          loadScene('battle1()');
         } else {
           output.innerHTML = `You rolled a ${charStat}.<br> The Gods may be on your side yet.`;
-          loadBattle1();
+          loadScene('battle1()');
         }
         break;
       case '2':
@@ -102,6 +118,9 @@ function rollForStat() {
       case '3':
         output.innerHTML = `This site might be a better fit for you.`;
         cryBaby();
+        break;
+      default:
+        wrgInput();
     }
     form.removeEventListener('submit', formListener);
   };
@@ -111,7 +130,7 @@ function rollForStat() {
 // First encounter
 
 function battle1() {
-  console.log(charClass)
+  let ratStat = 10
   output.innerHTML = `You bust through the door of the dungeon (which was a bad<br>
     idea I might add). The musk of the depths wafts across your face leaving you<br>
     slightly light headed. As you look around you cant see much in the dim light,<br>
@@ -126,9 +145,20 @@ function battle1() {
     e.preventDefault();
     let s = txtInput.value;
 
+
     switch (s) {
       case '1':
-        output.innerHTML = `Attacked`;
+        fight(charStat, ratStat);
+        if (results <= 0) {
+          console.log(`char: ${charStat}, rat: ${ratStat}`)
+          output.innerHTML = `You killed the rat! Huzzah!`;
+          console.log(results)
+          //loadScene(battle2)
+        } else {
+          output.innerHTML = `YOU DIED`;
+          deathFun()
+          console.log(deathCount)
+        }
         break;
       case '2':
         deathFun();
@@ -137,7 +167,7 @@ function battle1() {
         output.innerHTML = `You were attacked!!`;
         break
       default:
-        output.innerHTML = `Please take this serious, this isn't a game.<br> Make an appropriate  selection`;
+        wrgInput();
     }
     form.removeEventListener('submit', formListener);
   };
@@ -145,4 +175,32 @@ function battle1() {
 
 }
 
+//second encounter
+
+// function battle2() {
+//   output.innerHTML = `battle 2`
+
+//   let formListener = function (e) {
+//     e.preventDefault();
+//     let s = txtInput.value;
+
+//     switch (s) {
+//       case '1':
+
+//         output.innerHTML = `Attacked`;
+//         break;
+//       case '2':
+//         deathFun();
+//         break;
+//       case '3':
+//         output.innerHTML = `You were attacked!!`;
+//         break
+//      default:
+//         wrgInput();
+//     }
+//     form.removeEventListener('submit', formListener);
+//   };
+//   form.addEventListener('submit', formListener);
+
+// }
 
